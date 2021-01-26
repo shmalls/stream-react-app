@@ -1,0 +1,26 @@
+.form-wrapper {
+    display: flex;
+    flex-direction:row;
+    padding: 0rem 0rem 0rem 40px;
+}
+
+.form-field-url {
+    width:15rem;
+    height: 2rem;
+    font-size: 1.5rem;
+}
+
+.form-submit-wrapper {
+    height: 2rem;
+    font-size: 1.5rem;
+    padding-left: 0.9rem;
+}
+
+.form-submit {
+    height: 2.4rem;
+    font-size: 1.5rem;
+}
+
+.form-label {
+    width: 10rem;
+}

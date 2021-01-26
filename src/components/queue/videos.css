@@ -1,0 +1,28 @@
+.video-thumbnail {
+    object-fit: cover;
+    object-position: 50% 50%;
+    width: 10rem;
+    height: 5.625rem;
+}
+
+.video-wrapper {
+    display:flex;
+}
+
+.video-link {
+    color:white;
+    text-decoration: none;
+}
+
+.link-author {
+    font-size: 0.8125rem;
+    vertical-align: top;
+}
+
+.video-descriptors-wrapper {
+    list-style:none;
+    display:flex;
+    flex-direction: column;
+    padding-inline-start: 1rem;
+    text-align: left;
+}

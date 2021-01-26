@@ -1,0 +1,8 @@
+.queue-list-wrapper {
+    list-style: none;
+}
+
+.video-list-wrapper {
+    display:flex;
+    width:35rem;
+}
