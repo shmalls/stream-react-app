@@ -7,47 +7,96 @@ const config = {
 };
 const socket = io(ENDPOINT, config);
 
-const PLAYER_STATE = 'PLAYER_STATE';
-const PAUSE_VIDEO = 'PAUSE_VIDEO';
-const PLAY_VIDEO = 'PLAY_VIDEO';
-const ADD_VIDEO = 'ADD_VIDEO';
-const STOP_VIDEO = 'STOP_VIDEO';
+const CLIENT_PAUSE_VIDEO = 'CLIENT_PAUSE_VIDEO';
+const CLIENT_PLAY_VIDEO = 'CLIENT_PLAY_VIDEO';
+const CLIENT_ADD_VIDEO = 'CLIENT_ADD_VIDEO';
+const CLIENT_STOP_VIDEO = 'CLIENT_STOP_VIDEO';
+
+const SERVER_INIT_PLAYER = 'SERVER_INIT_PLAYER';
+const SERVER_PAUSE_VIDEO = 'SERVER_PAUSE_VIDEO';
+const SERVER_PLAY_VIDEO = 'SERVER_PLAY_VIDEO';
+const SERVER_ADD_VIDEO = 'SERVER_ADD_VIDEO';
+const SERVER_STOP_VIDEO = 'SERVER_STOP_VIDEO';
+
 
 function log(event, data) {
     switch(event) {
-        case ADD_VIDEO:
+        case CLIENT_ADD_VIDEO:
             console.log(`emitting ${event} with video ${data}`)
             break;
+        case SERVER_INIT_PLAYER:
+            console.log(`heard ${event} with data ${data}`);
+            break;
+        case SERVER_ADD_VIDEO:
+            console.log(`heard ${event} with video ${data}`);
+            break;
         default:
-            console.log(`emitting ${event}`);
+            console.log(`socket event ${event} with data ${data}`);
     }
 }
 
 // publishes play event
 export const emitPlay = () => {
-    socket.emit(PLAY_VIDEO);
+    log(CLIENT_PLAY_VIDEO);
+    socket.emit(CLIENT_PLAY_VIDEO);
 }
-
 
 // publishes pause event
 export const emitPause = () => {
-    socket.emit(PAUSE_VIDEO);
+    log(CLIENT_PAUSE_VIDEO);
+    socket.emit(CLIENT_PAUSE_VIDEO);
+}
+
+// publishes stop event
+export const emitStop = () => {
+    log(CLIENT_STOP_VIDEO);
+    socket.emit(CLIENT_STOP_VIDEO);
 }
 
 // publishes seek event
 
 // publishes add event
 export const emitAdd = (video) => {
-    log(ADD_VIDEO, video);
-    socket.emit(ADD_VIDEO, video);
+    log(CLIENT_ADD_VIDEO, video);
+    socket.emit(CLIENT_ADD_VIDEO, video);
 };
+
+// listens for play event
+export const listenPlay = (callback) => {
+    socket.on(SERVER_PLAY_VIDEO, (data) => {
+        log(SERVER_PLAY_VIDEO, data);
+        callback(data);
+    });
+}
+
+// listens for pause event
+export const listenPause = (callback) => {
+    socket.on(SERVER_PAUSE_VIDEO, (data) => {
+        log(SERVER_PAUSE_VIDEO, data);
+        callback(data);
+    });
+}
+
+// listens for stop event
+export const listenStop = (callback) => {
+    socket.on(SERVER_STOP_VIDEO, (data) => {
+        log(SERVER_STOP_VIDEO, data);
+        callback(data);
+    });
+}
 
 // listens for add events
 export const listenAdd = (callback) => {
-    socket.on(ADD_VIDEO, callback)
+    socket.on(SERVER_ADD_VIDEO, (video) => {
+        log(SERVER_ADD_VIDEO, video);
+        callback(video);
+    })
 }
 
 // listens for init event
-export const listenInit = () => {
-    socket.on(PLAYER_STATE)
+export const listenInit = (callback) => {
+    socket.on(SERVER_INIT_PLAYER, (player) => {
+        log(SERVER_INIT_PLAYER, player);
+        callback(player);
+    })
 }
