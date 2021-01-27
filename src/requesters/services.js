@@ -6,6 +6,11 @@ export async function getHistory() {
     return res.data;
 }
 
+export async function getMoreHistory(id) {
+    let res = await axios.get(API + id);
+    return res.data;
+}
+
 export async function addVideo(url) {
     let res = await axios.post(API, {
         url: url

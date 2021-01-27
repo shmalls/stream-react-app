@@ -1,5 +1,7 @@
 .queue-list-wrapper {
     list-style: none;
+    overflow-y:scroll;
+    max-height: 50rem;
 }
 
 .video-list-wrapper {
