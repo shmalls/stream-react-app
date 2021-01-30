@@ -8,8 +8,8 @@ import {
     ADD_VIDEO_REQUEST, 
     ADD_VIDEO_SUCCESS, 
     ADD_VIDEO_ERROR
-} from '../actions/actions'
-import * as socket from '../actions/socket-actions';
+} from '../actions/history-actions'
+import * as socket from '../requesters/sockets';
 
 const initialState = {
     added: false,

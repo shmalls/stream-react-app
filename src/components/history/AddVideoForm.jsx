@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types'
-import './addToQueueForm.css'
-import * as socket from '../../actions/socket-actions'
+import './addVideoForm.css'
+import * as socket from '../../requesters/sockets'
 
-class AddToQueueForm extends React.Component {
+class AddVideoForm extends React.Component {
     constructor(props) {
         super(props);
         this.state = {url: ''};
@@ -50,8 +50,8 @@ class AddToQueueForm extends React.Component {
     }
 }
 
-AddToQueueForm.propTypes = {
+AddVideoForm.propTypes = {
     handleSubmit: PropTypes.func
 }
 
-export default AddToQueueForm;
+export default AddVideoForm;

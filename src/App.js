@@ -1,14 +1,9 @@
-import logo from './logo.svg';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
-import { getHistory, addVideo, getMoreHistory } from './actions/actions';
-import List from '@material-ui/core/List'
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import Video from './components/queue/video';
-import VideoQueue from './components/queue/VideoQueue'
-import * as socket from './actions/socket-actions';
-import ReactPlayer from 'react-player'
+import { getHistory, addVideo, getMoreHistory } from './actions/history-actions';
+import VideoHistory from './components/history/VideoHistory'
+import VideoPlayer from './components/player/VideoPlayer'
+import * as socket from './requesters/sockets';
 import "./app.css"
 
 // Render a YouTube video player
@@ -36,8 +31,14 @@ class App extends React.Component {
                 <header className="App-header">{
                     history.loaded ? 
                     <div className="container">
-                        <ReactPlayer url={videos[0].URL} />
-                        <VideoQueue videos={videos} addVideo={this.props.addVideo} getMoreHistory={this.props.getMoreHistory} okayToMore={this.props.history.lastMore !== 0}/>
+                        <VideoPlayer url={videos[0].URL}/>
+                        <VideoHistory 
+                            videos={videos} 
+                            addVideo={this.props.addVideo} 
+                            getMoreHistory={this.props.getMoreHistory} 
+                            okayToMore={this.props.history.lastMore !== 0}
+                            moring={this.props.history.moring}
+                        />
                     </div> : ''
                 }
                 </header>
@@ -62,8 +63,7 @@ function mapDispatchToProps(dispatch, ownProps) {
 
 function mapStateToProps(state) {
     return {
-        history: state.history,
-        addVideo: state.addVideo
+        history: state.history
     };
 }
 

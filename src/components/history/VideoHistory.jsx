@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Video from './video';
-import AddToQueueForm from './AddToQueueForm';
-import './videoQueue.css';
-import * as socket from '../../actions/socket-actions'
+import AddVideoForm from './AddVideoForm';
+import './videoHistory.css';
+import * as socket from '../../requesters/sockets'
 
-class VideoQueue extends React.Component {
+class VideoHistory extends React.Component {
     constructor(props) {
         super(props);
         this.scrolled = this.scrolled.bind(this)
@@ -27,7 +27,7 @@ class VideoQueue extends React.Component {
     scrolled() {
         const element = document.querySelector('.queue-list-wrapper')
         if (element.offsetHeight + element.scrollTop >= element.scrollHeight) {
-            if(this.props.okayToMore) {
+            if(this.props.okayToMore && !this.props.moring) {
                 this.props.getMoreHistory(this.props.videos[this.props.videos.length - 1]._id);
             }
         }
@@ -36,7 +36,7 @@ class VideoQueue extends React.Component {
     render() {
         return (
             <div className="queue-wrapper">
-                <AddToQueueForm handleSubmit={this.props.addVideo} />
+                <AddVideoForm handleSubmit={this.props.addVideo} />
                 <ul className="queue-list-wrapper" onScroll={this.scrolled}>
                     {this.renderQueue()}
                 </ul>
@@ -45,11 +45,12 @@ class VideoQueue extends React.Component {
     }
 }
 
-VideoQueue.propTypes = {
+VideoHistory.propTypes = {
     videos: PropTypes.array,
     addVideo: PropTypes.func,
     getMoreHistory: PropTypes.func,
-    okayToMore: PropTypes.bool
+    okayToMore: PropTypes.bool,
+    moring: PropTypes.bool
 }
 
-export default VideoQueue;
+export default VideoHistory;
