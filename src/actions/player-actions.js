@@ -35,9 +35,12 @@ export const GET_PLAYER_SUCCESS = 'GET_PLAYER_SUCCESS';
 export const GET_PLAYER_ERROR = 'GET_PLAYER_ERROR';
 export const GOT_PLAY_EVENT = 'GOT_PLAY_EVENT';
 export const GOT_PAUSE_EVENT = 'GOT_PAUSE_EVENT';
+export const EVENT_FROM_SERVER_REINIT = 'EVENT_FROM_SERVER_REINIT';
+export const EXECUTE_EVENT = 'EXECUTE_EVENT';
 
 
-
+// PLAY is POST but server does not use object
+// object sent for server logging
 export function playVideo(player) {
     return function (dispatch) {
         dispatch({ type: GET_PLAY_REQUEST });
@@ -48,6 +51,7 @@ export function playVideo(player) {
     }
 }
 
+// PAUSE is POST server updates time based on client time sent
 export function pauseVideo(player) {
     return function (dispatch) {
         dispatch({ type: POST_PAUSE_REQUEST });
@@ -93,20 +97,21 @@ export function getPlayer() {
     }
 }
 
-export function gotPlayEvent(player) {
+export function gotPlayEvent(response) {
     return function(dispatch) {
-        dispatch({ type: GOT_PLAY_EVENT, data: player})
+        dispatch({ type: GOT_PLAY_EVENT, data: response.eventFromServer.player, event:response.eventFromServer})
     }
 }
 
-export function gotPauseEvent(player) {
+export function gotPauseEvent(response) {
+    console.log('in got pause event',response);
     return function(dispatch) {
-        dispatch({ type: GOT_PAUSE_EVENT, data: player})
+        dispatch({ type: GOT_PAUSE_EVENT, data: response.eventFromServer.player, event:response.eventFromServer})
     }
 }
 
-export function reinitialize() {
-    return function(dispatch) {
-        return dispatch({type: GET_PLAY_REINITIALIZE});
+export function executeEvent(index) {
+    return function (dispatch) {
+        dispatch({ type: EXECUTE_EVENT, data: index });
     }
 }

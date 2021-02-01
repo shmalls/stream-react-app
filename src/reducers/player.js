@@ -16,7 +16,9 @@ import {
     GET_PLAYER_SUCCESS,
     GET_PLAYER_ERROR,
     GOT_PLAY_EVENT,
-    GOT_PAUSE_EVENT
+    GOT_PAUSE_EVENT,
+    EVENT_FROM_SERVER_REINIT,
+    EXECUTE_EVENT
 } from '../actions/player-actions';
 
 const initialState = {
@@ -28,11 +30,13 @@ const initialState = {
     postedPause: false,
     gettingPause:false,
     gotPause: false,
+    gotPlay: false,
     postingSeek: false,
     postedSeek: false,
+    eventFromServer: false,
     loaded: false,
     error: false,
-    errorMsg: undefined
+    errorMsg: undefined,
 }
 
 export default function(state = initialState, action) {
@@ -65,11 +69,16 @@ export default function(state = initialState, action) {
         case GET_PLAYER_STATE:
             return { ...state, ...action.data};
         case GOT_PLAY_EVENT:
-            return { ...state, ...action.data};
+            return { ...state, ...action.data, gotPlay: true};
         case GOT_PAUSE_EVENT:
-            return { ...state, ...action.data};
+            return { ...state, ...action.data, gotPause: true};
+        case EVENT_FROM_SERVER_REINIT:
+            return { ...state, eventFromServer: false}
         case GET_PLAYER_REQUEST: 
             return { ...state, loading: true };
+        // case EXECUTE_EVENT: 
+        //     state.events[action.data].executed = true;
+        //     return {...state};
         case GET_PLAYER_SUCCESS: 
             return { ...state, ...action.data, loading: false, loaded: true };
         case GET_PLAYER_ERROR: 
