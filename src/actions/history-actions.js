@@ -9,6 +9,7 @@ export const GET_MORE_HISTORY_ERROR = 'GET_MORE_HISTORY_ERROR';
 export const ADD_VIDEO_REQUEST = 'ADD_VIDEO_REQUEST';
 export const ADD_VIDEO_SUCCESS = 'ADD_VIDEO_SUCCESS';
 export const ADD_VIDEO_ERROR = 'ADD_VIDEO_ERROR';
+export const GOT_NEW_VIDEO = 'GOT_NEW_VIDEO';
 
 export function addVideo(url) {
     return function (dispatch) {
@@ -39,5 +40,11 @@ export function getMoreHistory(id) {
             response => dispatch({ type: GET_MORE_HISTORY_SUCCESS, data: response }),
             err => dispatch({ type: GET_MORE_HISTORY_ERROR, error: err})
         );
+    }
+}
+
+export function gotNewVideo(response) {
+    return function(dispatch) {
+        dispatch({type: GOT_NEW_VIDEO , data: response});
     }
 }

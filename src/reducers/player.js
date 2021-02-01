@@ -18,7 +18,7 @@ import {
     GOT_PLAY_EVENT,
     GOT_PAUSE_EVENT,
     EVENT_FROM_SERVER_REINIT,
-    EXECUTE_EVENT
+    GOT_NEW_VIDEO
 } from '../actions/player-actions';
 
 const initialState = {
@@ -74,11 +74,10 @@ export default function(state = initialState, action) {
             return { ...state, ...action.data, gotPause: true};
         case EVENT_FROM_SERVER_REINIT:
             return { ...state, eventFromServer: false}
+        case GOT_NEW_VIDEO:
+            return {...state, time: 0, playing: true, started: true}
         case GET_PLAYER_REQUEST: 
             return { ...state, loading: true };
-        // case EXECUTE_EVENT: 
-        //     state.events[action.data].executed = true;
-        //     return {...state};
         case GET_PLAYER_SUCCESS: 
             return { ...state, ...action.data, loading: false, loaded: true };
         case GET_PLAYER_ERROR: 

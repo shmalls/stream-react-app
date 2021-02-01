@@ -37,6 +37,7 @@ export const GOT_PLAY_EVENT = 'GOT_PLAY_EVENT';
 export const GOT_PAUSE_EVENT = 'GOT_PAUSE_EVENT';
 export const EVENT_FROM_SERVER_REINIT = 'EVENT_FROM_SERVER_REINIT';
 export const EXECUTE_EVENT = 'EXECUTE_EVENT';
+export const GOT_NEW_VIDEO = 'GOT_NEW_VIDEO';
 
 
 // PLAY is POST but server does not use object
@@ -62,30 +63,30 @@ export function pauseVideo(player) {
     }
 }
 
-export function getPauseVideo() {
-    return function (dispatch) {
-        dispatch({ type: GET_PAUSE_REQUEST });
-        return socket.listenPause((data) => {
-            return dispatch({type: GET_PAUSE_SUCCESS, data: data});
-        })
-    }
-}
+// export function getPauseVideo() {
+//     return function (dispatch) {
+//         dispatch({ type: GET_PAUSE_REQUEST });
+//         return socket.listenPause((data) => {
+//             return dispatch({type: GET_PAUSE_SUCCESS, data: data});
+//         })
+//     }
+// }
 
-export function seekVideo(player) {
-    return function (dispatch) {
-        dispatch({ type: POST_SEEK_REQUEST });
-        return socket.newEmit(CLIENT_SEEK_VIDEO, player).then(
-            response => dispatch({ type: POST_SEEK_SUCCESS, data: response }),
-            err => dispatch({type: POST_SEEK_ERROR, error: err })
-        )
-    }
-}
+// export function seekVideo(player) {
+//     return function (dispatch) {
+//         dispatch({ type: POST_SEEK_REQUEST });
+//         return socket.newEmit(CLIENT_SEEK_VIDEO, player).then(
+//             response => dispatch({ type: POST_SEEK_SUCCESS, data: response }),
+//             err => dispatch({type: POST_SEEK_ERROR, error: err })
+//         )
+//     }
+// }
 
-export function getPlayerState(player) {
-    return function(dispatch) {
-        dispatch({ type: GET_PLAYER_STATE, data: player });
-    }
-}
+// export function getPlayerState(player) {
+//     return function(dispatch) {
+//         dispatch({ type: GET_PLAYER_STATE, data: player });
+//     }
+// }
 
 export function getPlayer() {
     return function(dispatch) {
@@ -104,14 +105,7 @@ export function gotPlayEvent(response) {
 }
 
 export function gotPauseEvent(response) {
-    console.log('in got pause event',response);
     return function(dispatch) {
         dispatch({ type: GOT_PAUSE_EVENT, data: response.eventFromServer.player, event:response.eventFromServer})
-    }
-}
-
-export function executeEvent(index) {
-    return function (dispatch) {
-        dispatch({ type: EXECUTE_EVENT, data: index });
     }
 }

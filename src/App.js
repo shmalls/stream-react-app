@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { getHistory, addVideo, getMoreHistory } from './actions/history-actions';
+import { getHistory, addVideo, getMoreHistory, gotNewVideo } from './actions/history-actions';
 import VideoHistory from './components/history/VideoHistory'
 import VideoPlayer from './components/player/VideoPlayer'
 import * as socket from './requesters/sockets';
@@ -19,6 +19,7 @@ class App extends React.Component {
             if(videos) {
                 videos.unshift(video);
                 this.setState({videos: videos})
+                this.props.gotNewVideo(video);
             }
         });
     }
@@ -57,6 +58,9 @@ function mapDispatchToProps(dispatch, ownProps) {
         },
         addVideo: (url) => {
             return dispatch(addVideo(url));
+        },
+        gotNewVideo: (video) => {
+            return dispatch(gotNewVideo(video));
         }
     }
 }

@@ -5,12 +5,9 @@ import * as socket from '../../requesters/sockets';
 import { 
     playVideo, 
     pauseVideo, 
-    seekVideo, 
-    getPlayerState, 
     getPlayer, 
     gotPlayEvent,
     gotPauseEvent,
-    executeEvent
 } from '../../actions/player-actions';
 import ReactPlayer from 'react-player'
 import './videoPlayer.css'
@@ -22,12 +19,9 @@ class VideoPlayer extends React.Component {
         this.state = { hasSynced: false, syncing: false }
         this.onPlay = this.onPlay.bind(this);
         this.onPause = this.onPause.bind(this);
-        this.onSeek = this.onSeek.bind(this);
         this.getPlayerTime = this.getPlayerTime.bind(this);
         this.getInternalPlayer = this.getInternalPlayer.bind(this);
         this.seekPlayer = this.seekPlayer.bind(this);
-        this.getNextUnexecutedEvent = this.getNextUnexecutedEvent.bind(this);
-        this.hasUnexecutedEvent = this.hasUnexecutedEvent.bind(this);
     }
 
     componentDidMount() {
@@ -42,49 +36,11 @@ class VideoPlayer extends React.Component {
     }
 
     onPlay() {
-        console.log('onplay:',this.props)
-        // first time user clicks play, get player from server
-        if (this.getPlayerTime() !== this.props.player.time) {
-            this.props.getPlayer()
-            // user has already engaged the player, start playing from the server
-        } else if(this.hasUnexecutedEvent()) {
-            if(this.props.socketEvents.events[this.getNextUnexecutedEvent()].type === 'PAUSE') {
-                this.props.executeEvent(this.getNextUnexecutedEvent());
-                this.seekPlayer();
-            }
-        } else if (!this.player.loading) {
-            this.props.getPlay(this.props.player)
-        }
-    }
-
-    getNextUnexecutedEvent() {
-        for(let i =0; i < this.props.socketEvents.events.length; i++) {
-            if(this.props.socketEvents.events[i].executed) {
-                continue;
-            }
-            return i;
-        }
-        return undefined;
-    }
-
-    hasUnexecutedEvent() {
-        if(this.getNextUnexecutedEvent() === undefined) {
-            return false;
-        }
-        return true;
+        this.props.getPlay(this.props.player)
     }
 
     onPause() {
-        console.log("onpause", this.props)
-        if(this.hasUnexecutedEvent()) {
-            if(this.props.socketEvents.events[this.getNextUnexecutedEvent()].type === 'PAUSE') {
-                this.props.executeEvent(this.getNextUnexecutedEvent());
-                this.seekPlayer();
-            }
-        } else if (!this.props.player.postingPause) {
-            console.log("posted pause");
-            this.props.pauseVideo({ playing: false, time: this.player.getCurrentTime() });
-        }
+        this.props.pauseVideo({ playing: false, time: Math.round(this.player.getCurrentTime()) });
     }
 
     getInternalPlayer() {
@@ -96,15 +52,9 @@ class VideoPlayer extends React.Component {
         return undefined;
     }
 
-    onSeek(seconds) {
-        if (!this.player.postingSeek) {
-            this.props.seekVideo({ playing: true, time: seconds });
-        }
-    }
-
     getPlayerTime() {
         if (this.player) {
-            return Math.round(this.player.getCurrentTime());
+            return this.player.getCurrentTime();
         }
     }
 
@@ -115,13 +65,12 @@ class VideoPlayer extends React.Component {
     }
 
     render() {
-        console.log("this.props",this.props);
-        if (this.props.player.started && this.player && this.getPlayerTime() === 0) {
-            if (this.props.player.time !== this.getPlayerTime()) {
+        if (this.player && this.props.player.time !== this.getPlayerTime()) {
+            if(Math.abs(this.props.player.time - this.getPlayerTime())>2.5) {
                 this.player.seekTo(this.props.player.time);
-                if (this.player && this.player.getInternalPlayer && this.player.getInternalPlayer.playVideo && this.props.player.playing) {
-                    this.player.getInternalPlayer().playVideo();
-                }
+            }
+            if (this.player && this.player.getInternalPlayer && this.player.getInternalPlayer.playVideo && this.props.player.playing) {
+                this.player.getInternalPlayer().playVideo();
             }
         }
         return (
@@ -134,9 +83,6 @@ class VideoPlayer extends React.Component {
                     playsinline={true}
                     onPlay={this.onPlay}
                     onPause={this.onPause}
-                    onSeek={() => {
-                        console.log("seek????????????")
-                    }}
                     onEnded={socket.emitEnd}
                     config={{
                         youtube: {
@@ -144,7 +90,8 @@ class VideoPlayer extends React.Component {
                                 autoplay: 1,
                                 enablejsapi: 1,
                                 modestbranding: 1,
-                                rel: 0
+                                rel: 0,
+                                disablekb: 1
                             }
                         }
                     }}
@@ -166,12 +113,6 @@ function mapDispatchToProps(dispatch) {
         pauseVideo: (player) => {
             return dispatch(pauseVideo(player));
         },
-        seekVideo: (player) => {
-            return dispatch(seekVideo(player));
-        },
-        getPlayerState: (player) => {
-            return dispatch(getPlayerState(player))
-        },
         getPlayer: () => {
             return dispatch(getPlayer());
         },
@@ -180,9 +121,6 @@ function mapDispatchToProps(dispatch) {
         },
         gotPauseEvent: (player) => {
             return dispatch(gotPauseEvent(player));
-        },
-        executeEvent: (index) => {
-            return dispatch(executeEvent(index));
         }
     }
 }
