@@ -36,7 +36,7 @@ class VideoPlayer extends React.Component {
     }
 
     onPlay() {
-        this.props.getPlay(this.props.player)
+        this.props.getPlay({ playing: true, time: Math.round(this.player.getCurrentTime()) })
     }
 
     onPause() {
