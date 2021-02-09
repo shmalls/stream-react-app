@@ -19,10 +19,12 @@ import { Socket } from 'socket.io-client';
 export const GET_PLAY_REQUEST = 'GET_PLAY_REQUEST';
 export const GET_PLAY_SUCCESS = 'GET_PLAY_SUCCESS';
 export const GET_PLAY_ERROR = 'GET_PLAY_ERROR';
+export const POST_PLAY_CANCELLED = 'POST_PLAY_CANCELLED';
 export const GET_PLAY_REINITIALIZE = 'GET_PLAY_REINITIALIZE';
 export const POST_PAUSE_REQUEST = 'POST_PAUSE_REQUEST';
 export const POST_PAUSE_SUCCESS = 'POST_PAUSE_SUCCESS';
 export const POST_PAUSE_ERROR = 'POST_PAUSE_ERROR';
+export const POST_PAUSE_CANCELLED = 'POST_PAUSE_CANCELLED';
 export const GET_PAUSE_REQUEST = 'POST_PAUSE_REQUEST';
 export const GET_PAUSE_SUCCESS = 'POST_PAUSE_SUCCESS';
 export const GET_PAUSE_ERROR = 'POST_PAUSE_ERROR';
@@ -42,24 +44,42 @@ export const GOT_NEW_VIDEO = 'GOT_NEW_VIDEO';
 
 // PLAY is POST but server does not use object
 // object sent for server logging
-export function playVideo(player) {
+export function playVideo(player, events) {
     return function (dispatch) {
         dispatch({ type: GET_PLAY_REQUEST });
-        return socket.newEmit(CLIENT_PLAY_VIDEO, player).then(
-            response => dispatch({ type: GET_PLAY_SUCCESS, data: response }),
-            err => dispatch({ type: GET_PLAY_ERROR, error: err })
-        );
+
+        //check if last event was received within the last 250ms
+        //and if the last event is the same as the event we are about to send
+        if(events.length > 0 
+            //&& Math.abs((Date.now() - events[0].timeStamp)) < 250
+            && player.playing === events[0].player.playing && Math.abs(player.time - events[0].player.time) < 2) {
+                return dispatch({type: POST_PLAY_CANCELLED })
+        } else {
+            return socket.newEmit(CLIENT_PLAY_VIDEO, player).then(
+                response => dispatch({ type: GET_PLAY_SUCCESS, data: response }),
+                err => dispatch({ type: GET_PLAY_ERROR, error: err })
+            );
+        }
     }
 }
 
 // PAUSE is POST server updates time based on client time sent
-export function pauseVideo(player) {
+export function pauseVideo(player, events) {
     return function (dispatch) {
         dispatch({ type: POST_PAUSE_REQUEST });
-        return socket.newEmit(CLIENT_PAUSE_VIDEO, player).then(
-            response => dispatch({ type: POST_PAUSE_SUCCESS, data: response }),
-            err => dispatch({type: POST_PAUSE_ERROR, error: err })
-        )
+
+        //check if last event was received within the last 250ms
+        //and if the last event is the same as the event we are about to send
+        if(events.length > 0 
+            //&& Math.abs((Date.now() - events[0].timeStamp)) < 250
+            && player.playing === events[0].player.playing && Math.abs(player.time - events[0].player.time) < 2) {
+                return dispatch({type: POST_PAUSE_CANCELLED })
+        } else {
+            return socket.newEmit(CLIENT_PAUSE_VIDEO, player).then(
+                response => dispatch({ type: POST_PAUSE_SUCCESS, data: response }),
+                err => dispatch({type: POST_PAUSE_ERROR, error: err })
+            )
+        }
     }
 }
 

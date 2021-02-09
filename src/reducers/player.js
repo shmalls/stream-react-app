@@ -18,7 +18,9 @@ import {
     GOT_PLAY_EVENT,
     GOT_PAUSE_EVENT,
     EVENT_FROM_SERVER_REINIT,
-    GOT_NEW_VIDEO
+    GOT_NEW_VIDEO,
+    POST_PAUSE_CANCELLED,
+    POST_PLAY_CANCELLED
 } from '../actions/player-actions';
 
 const initialState = {
@@ -45,6 +47,8 @@ export default function(state = initialState, action) {
             return { ...state, loading: true };
         case GET_PLAY_SUCCESS:
             return { ...state, ...action.data , loading: false, loaded: true };
+        case POST_PLAY_CANCELLED:
+            return { ...state, loading: false };
         case GET_PLAY_ERROR:
             //console.log("REDUCER:GET_PLAY_ERROR: error",action.err);
             return { ...state, error: true, errorMsg: action.err }
@@ -54,6 +58,8 @@ export default function(state = initialState, action) {
             return { ...state, postingPause: true }
         case POST_PAUSE_SUCCESS:
             return { ...state, ...action.data, postingPause: false, postedPause: true }
+        case POST_PAUSE_CANCELLED:
+            return { ...state, postingPause: false }
         case POST_PAUSE_ERROR:
             return { ...state, postingPause: false, error: true, errorMsg: action.error }
         case GET_PAUSE_REQUEST:

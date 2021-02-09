@@ -16,7 +16,7 @@ import { Socket } from 'socket.io-client';
 class VideoPlayer extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { hasSynced: false, syncing: false }
+        this.state = {playing: false}
         this.onPlay = this.onPlay.bind(this);
         this.onPause = this.onPause.bind(this);
         this.getPlayerTime = this.getPlayerTime.bind(this);
@@ -26,8 +26,16 @@ class VideoPlayer extends React.Component {
 
     componentDidMount() {
         //socket.listenPlayerState(this.props.getPlayerState)
-        socket.listenPlay(this.props.gotPlayEvent);
-        socket.listenPause(this.props.gotPauseEvent);
+        socket.listenPlay((data)=> {
+            this.props.gotPlayEvent(data)
+            this.player.seekTo(this.props.player.time);
+            this.setState({playing:true});
+        });
+        socket.listenPause((data) => {
+            this.props.gotPauseEvent(data)
+            this.player.seekTo(this.props.player.time);
+            this.setState({playing:false});
+        });
         this.props.getPlayer();
     }
 
@@ -36,11 +44,11 @@ class VideoPlayer extends React.Component {
     }
 
     onPlay() {
-        this.props.getPlay({ playing: true, time: Math.round(this.player.getCurrentTime()) })
+        this.props.getPlay({ ...this.props.player, playing: true, time: Math.round(this.player.getCurrentTime()) }, this.props.socketEvents.events)
     }
 
     onPause() {
-        this.props.pauseVideo({ playing: false, time: Math.round(this.player.getCurrentTime()) });
+        this.props.pauseVideo({ ...this.props.player, playing: false, time: Math.round(this.player.getCurrentTime()) }, this.props.socketEvents.events);
     }
 
     getInternalPlayer() {
@@ -64,9 +72,11 @@ class VideoPlayer extends React.Component {
         }
     }
 
+
+
     render() {
         if (this.player && this.props.player.time !== this.getPlayerTime()) {
-            if(Math.abs(this.props.player.time - this.getPlayerTime())>2.5) {
+            if(Math.abs(this.props.player.time - this.getPlayerTime())>2) {
                 this.player.seekTo(this.props.player.time);
             }
             if (this.player && this.player.getInternalPlayer && this.player.getInternalPlayer.playVideo && this.props.player.playing) {
@@ -78,7 +88,7 @@ class VideoPlayer extends React.Component {
                 <ReactPlayer
                     ref={this.ref}
                     url={this.props.url}
-                    playing={this.props.player.playing}
+                    playing={this.state.playing}
                     controls={true}
                     playsinline={true}
                     onPlay={this.onPlay}
@@ -107,11 +117,11 @@ VideoPlayer.propTypes = {
 
 function mapDispatchToProps(dispatch) {
     return {
-        getPlay: (player) => {
-            return dispatch(playVideo(player));
+        getPlay: (player, events) => {
+            return dispatch(playVideo(player, events));
         },
-        pauseVideo: (player) => {
-            return dispatch(pauseVideo(player));
+        pauseVideo: (player, events) => {
+            return dispatch(pauseVideo(player, events));
         },
         getPlayer: () => {
             return dispatch(getPlayer());
