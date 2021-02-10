@@ -16,7 +16,7 @@ import { Socket } from 'socket.io-client';
 class VideoPlayer extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {playing: false}
+        this.state = {playing: false, hasInteracted: false}
         this.onPlay = this.onPlay.bind(this);
         this.onPause = this.onPause.bind(this);
         this.getPlayerTime = this.getPlayerTime.bind(this);
@@ -25,18 +25,24 @@ class VideoPlayer extends React.Component {
     }
 
     componentDidMount() {
-        //socket.listenPlayerState(this.props.getPlayerState)
         socket.listenPlay((data)=> {
             this.props.gotPlayEvent(data)
-            this.player.seekTo(this.props.player.time);
+            this.seekPlayer();
             this.setState({playing:true});
         });
         socket.listenPause((data) => {
             this.props.gotPauseEvent(data)
-            this.player.seekTo(this.props.player.time);
+            this.seekPlayer();
             this.setState({playing:false});
         });
-        this.props.getPlayer();
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if(this.state.hasInteracted === false && (prevProps.player.loading && this.props.player.loaded) 
+            && (prevProps.player.playing === false && this.props.player.playing)) {
+            this.seekPlayer();
+            this.setState({playing:true, hasInteracted: true});
+        }
     }
 
     ref = player => {
@@ -45,10 +51,14 @@ class VideoPlayer extends React.Component {
 
     onPlay() {
         this.props.getPlay({ ...this.props.player, playing: true, time: Math.round(this.player.getCurrentTime()) }, this.props.socketEvents.events)
+        this.setState({playing:true});        
     }
 
     onPause() {
-        this.props.pauseVideo({ ...this.props.player, playing: false, time: Math.round(this.player.getCurrentTime()) }, this.props.socketEvents.events);
+        if(this.state.hasInteracted) {
+            this.props.pauseVideo({ ...this.props.player, playing: false, time: Math.round(this.player.getCurrentTime()) }, this.props.socketEvents.events);
+            this.setState({playing:false});
+        }
     }
 
     getInternalPlayer() {
@@ -67,22 +77,12 @@ class VideoPlayer extends React.Component {
     }
 
     seekPlayer() {
-        if(this.player) {
+        if(this.player && this.props.player.time) {
             this.player.seekTo(this.props.player.time);
         }
     }
 
-
-
     render() {
-        if (this.player && this.props.player.time !== this.getPlayerTime()) {
-            if(Math.abs(this.props.player.time - this.getPlayerTime())>2) {
-                this.player.seekTo(this.props.player.time);
-            }
-            if (this.player && this.player.getInternalPlayer && this.player.getInternalPlayer.playVideo && this.props.player.playing) {
-                this.player.getInternalPlayer().playVideo();
-            }
-        }
         return (
             <div className="player-wrapper" >
                 <ReactPlayer
