@@ -1,6 +1,6 @@
 import io from "socket.io-client";
 
-const ENDPOINT = "http://69.154.54.105:4001";
+const ENDPOINT = "http://localhost:4001";
 const config = {
     withCredentials: true,
     extraHeaders: { "custom-headers": "test" }
@@ -11,6 +11,8 @@ const RECEIVING = "RECEIVING"
 const SENDING = "SENDING";
 const POST = 'POST'
 const GET = 'GET'
+
+export const TAKE_CONTROL_EVENT = { id: 'TAKE_CONTROL', type: SENDING, method: POST }
 
 export const CLIENT_PAUSE_VIDEO = { id: 'CLIENT_PAUSE_VIDEO', type: SENDING, method: POST };
 export const CLIENT_PLAY_VIDEO = { id: 'CLIENT_PLAY_VIDEO', type: SENDING, method: POST };
@@ -44,6 +46,18 @@ export function emitLog(event, data, callback) {
     socket.emit(event.id, data, callback);
 }
 
+export function emitLogPromise(event) {
+    // log(event, data, callback);
+    return new Promise((resolve, reject)=> {
+        socket.emit(event.id, (err, response) => {
+            if(err) {
+                return reject(err);
+            }
+            return resolve(response);
+        });
+    })
+}
+
 export async function newEmit(event, data) {
     log(event, data)
     return new Promise((resolve, reject) => {
@@ -53,6 +67,20 @@ export async function newEmit(event, data) {
             }
             return resolve(response);
         })
+    })
+}
+
+// publishes take control
+export const emitTakeControl = () => {
+    log(TAKE_CONTROL_EVENT);
+    // emitLogPromise(TAKE_CONTROL_EVENT)
+    return new Promise((resolve, reject)=> {
+        socket.emit(TAKE_CONTROL_EVENT.id, (err, response) => {
+            if(err) {
+                return reject(err);
+            }
+            return resolve(response);
+        });
     })
 }
 

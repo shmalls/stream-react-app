@@ -1,5 +1,5 @@
 const axios = require('axios');
-const API = 'http://69.154.54.105:6969/api/videos/'
+const API = 'http://localhost:6969/api/videos/'
 
 export async function getHistory() {
     let res = await axios.get(API)

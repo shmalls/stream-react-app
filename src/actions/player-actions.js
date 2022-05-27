@@ -40,7 +40,20 @@ export const GOT_PAUSE_EVENT = 'GOT_PAUSE_EVENT';
 export const EVENT_FROM_SERVER_REINIT = 'EVENT_FROM_SERVER_REINIT';
 export const EXECUTE_EVENT = 'EXECUTE_EVENT';
 export const GOT_NEW_VIDEO = 'GOT_NEW_VIDEO';
+export const TAKE_CONTROL_REQUEST = 'TAKE_CONTROL_REQUEST';
+export const TAKE_CONTROL_SUCCESS = 'TAKE_CONTROL_SUCCESS';
+export const TAKE_CONTROL_ERROR = 'TAKE_CONTROL_ERROR';
 
+
+export function takeControl() {
+    return function(dispatch) {
+        dispatch({type: TAKE_CONTROL_REQUEST});
+        return socket.emitTakeControl().then(
+            response => dispatch({ type: TAKE_CONTROL_SUCCESS, data: response }),
+            err => dispatch({ type: TAKE_CONTROL_ERROR, error: err })
+        )
+    }
+}
 
 // PLAY is POST but server does not use object
 // object sent for server logging

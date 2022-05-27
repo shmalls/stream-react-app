@@ -1,6 +1,8 @@
 import React from 'react';
+import { Button } from 'react-native';
 import { connect } from 'react-redux';
 import { getHistory, addVideo, getMoreHistory, gotNewVideo } from './actions/history-actions';
+import { takeControl } from './actions/player-actions'
 import VideoHistory from './components/history/VideoHistory'
 import VideoPlayer from './components/player/VideoPlayer'
 import * as socket from './requesters/sockets';
@@ -31,8 +33,12 @@ class App extends React.Component {
             <div className="App">
                 <header className="App-header">{
                     history.loaded ? 
+                    <>
+                    <Button
+                        onPress={this.props.takeControl}
+                        title="Take Control"></Button>
                     <div className="container">
-                        <VideoPlayer url={videos[0].URL}/>
+                        <VideoPlayer url={videos[0] ? videos[0].URL : ''}/>
                         <VideoHistory 
                             videos={videos} 
                             addVideo={this.props.addVideo} 
@@ -40,7 +46,9 @@ class App extends React.Component {
                             okayToMore={this.props.history.lastMore !== 0}
                             moring={this.props.history.moring}
                         />
-                    </div> : ''
+                    </div>
+                    </>
+                     : ''
                 }
                 </header>
             </div>
@@ -61,6 +69,9 @@ function mapDispatchToProps(dispatch, ownProps) {
         },
         gotNewVideo: (video) => {
             return dispatch(gotNewVideo(video));
+        },
+        takeControl: () => {
+            return dispatch(takeControl());
         }
     }
 }
